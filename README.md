@@ -6,7 +6,7 @@
 ## Team Name
 - 
 
-## 🛠️ Team Members
+## Team Members
 - **[Luke Walsh]** - GitHub: https://github.com/LukeJwalsh
 - **[Andrew Flammia]** - GitHub: 
 - **[Owen Gibbons]** - GitHub:
