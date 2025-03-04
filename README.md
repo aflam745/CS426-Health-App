@@ -4,13 +4,13 @@
 **Health 2.0** - A mobile application for tracking prescriptions, setting reminders, managing refills, and logging health metrics.
 
 ## Team Name
-- 
+- Health 2.0 Team (Team 01)
 
 ## 🛠️ Team Members
 - **[Luke Walsh]** - GitHub: https://github.com/LukeJwalsh
-- **[Andrew Flammia]** - GitHub: 
-- **[Owen Gibbons]** - GitHub:
-- **[Mattheus Ferreira]** - GitHub:
+- **[Andrew Flammia]** - GitHub: https://github.com/aflam745
+- **[Owen Gibbons]** - GitHub: https://github.com/owen-gibbons
+- **[Mattheus Ferreira]** - GitHub: https://github.com/teuferr
 
 ## Overview
 **Health 2.0** is a mobile application designed to simplify prescription tracking, medication reminders, and health metric logging.  
