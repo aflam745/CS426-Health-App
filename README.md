@@ -6,7 +6,7 @@
 ## Team Name
 - Health 2.0 Team (Team 01)
 
-## 🛠️ Team Members
+## Team Members
 - **[Luke Walsh]** - GitHub: https://github.com/LukeJwalsh
 - **[Andrew Flammia]** - GitHub: https://github.com/aflam745
 - **[Owen Gibbons]** - GitHub: https://github.com/owen-gibbons
