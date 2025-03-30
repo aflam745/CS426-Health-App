@@ -1,54 +1,42 @@
-# React + TypeScript + Vite
+# CS426-Health-App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Name
+**Health 2.0** - A mobile application for tracking prescriptions, setting reminders, managing refills, and logging health metrics.
 
-Currently, two official plugins are available:
+## Team Name
+- Health 2.0 Team (Team 01)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Team Members
+- **[Luke Walsh]** - GitHub: https://github.com/LukeJwalsh
+- **[Andrew Flammia]** - GitHub: https://github.com/aflam745
+- **[Owen Gibbons]** - GitHub: https://github.com/owen-gibbons
+- **[Mattheus Ferreira]** - GitHub: https://github.com/teuferr
 
-## Expanding the ESLint configuration
+## Overview
+**Health 2.0** is a mobile application designed to simplify prescription tracking, medication reminders, and health metric logging.
+The app also streamlines the prescription renewal process with doctors and allows users to maintain a digital health journal.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Core Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Home View
+- Graphical view of various health statistics over time (e.g., weight, sleep).
+- Dropdown menu to switch between different health metrics.
+- Checklist of health reminders that users can check off.
+- Secure login system to retrieve account-related data.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Prescriptions
+- Overview of active prescriptions.
+- Expand a prescription to view detailed information.
+- Create new prescriptions with dosage, name, and scheduled intake time.
+- Optional text message reminders for medication.
+- Notifications for low supply with an option to order refills.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Journal
+- Overview of user-created health metrics (e.g., blood sugar, sleep patterns).
+- Interactive chart showing progression over time.
+- Daily log that users can update each day.
+- Ability to create a new journal with a goal and optional reminder notifications.
+- Dropdown menu to switch between different tracked metrics.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Setup Instructions (Will be setup in future sprints)
+-
