@@ -13,7 +13,7 @@
 - **[Mattheus Ferreira]** - GitHub: https://github.com/teuferr
 
 ## Overview
-**Health 2.0** is a mobile application designed to simplify prescription tracking, medication reminders, and health metric logging.  
+**Health 2.0** is a mobile application designed to simplify prescription tracking, medication reminders, and health metric logging.
 The app also streamlines the prescription renewal process with doctors and allows users to maintain a digital health journal.
 
 ## Core Features
@@ -39,4 +39,4 @@ The app also streamlines the prescription renewal process with doctors and allow
 - Dropdown menu to switch between different tracked metrics.
 
 ## Setup Instructions (Will be setup in future sprints)
-- 
+-
