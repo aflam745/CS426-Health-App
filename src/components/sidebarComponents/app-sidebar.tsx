@@ -25,7 +25,7 @@ const items = [
   },
   {
     title: "Prescription",
-    url: "#",
+    url: "./prescriptions",
     icon: HeartPulse,
   },
   {
