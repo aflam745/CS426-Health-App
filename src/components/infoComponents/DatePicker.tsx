@@ -15,7 +15,7 @@ import {
 
 interface DatePickerProps {
   value: Date | null
-  onChange: (date: Date) => void
+  onChange: (date: Date | null) => void
 }
 
 export function DatePicker({ value, onChange }: DatePickerProps) {
@@ -36,12 +36,13 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={value}
-          onSelect={onChange}
+          selected={value ?? undefined}
+          onSelect={(date) => onChange(date ?? null)} 
           initialFocus
-        //   captionLayout="dropdown-buttons"
-        //   fromDate={new Date(1900, 0, 1)}
-        //   toDate={new Date(2030, 11, 31)}
+          // Optional props:
+          // captionLayout="dropdown-buttons"
+          // fromDate={new Date(1900, 0, 1)}
+          // toDate={new Date(2030, 11, 31)}
         />
       </PopoverContent>
     </Popover>
