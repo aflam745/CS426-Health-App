@@ -103,7 +103,7 @@ export function ProfileForm() {
                 </FormItem>
             )}
             />
-        <Button type="submit" className="cursor-pointer border-2 border-transparent hover:border-black hover:text-black hover:bg-white transition-all duration-200 hover:scale-105">
+        <Button type="submit" className="cursor-pointer hover:scale-95">
           Update
         </Button>
       </form>
