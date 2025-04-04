@@ -13,6 +13,7 @@ import { usePrescriptions } from '../../hooks/usePrescriptions';
 import { PrescriptionList } from './PrescriptionList';
 import { AlertsPanel } from './AlertsPanel';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch'
 import { Plus } from 'lucide-react';
 
 export function PrescriptionsPage(): React.ReactElement {
@@ -27,9 +28,11 @@ export function PrescriptionsPage(): React.ReactElement {
     
     const [showAddModal, setShowAddModal] = useState<boolean>(false);
     const lowSupplyThreshold = 4;
+    const [phoneNumber, setPhoneNumber] = useState<string>("");
     const upcomingRefillsDays = 7;
     const lowSupplyPrescriptions = getLowSupplyPrescriptions(lowSupplyThreshold);
     const upcomingRefills = getUpcomingRefills(upcomingRefillsDays);
+    const [enableSmsReminders, setEnableSmsReminders] = useState<boolean>(false);
     
     const handleRequestRefill = (id: number): void => {
         requestRefill(id);
@@ -113,6 +116,35 @@ export function PrescriptionsPage(): React.ReactElement {
                     placeholder="Number of pills/doses"
                     />
                 </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="sms-reminders" className="text-right">
+                    SMS Reminders
+                    </Label>
+                    <div className="flex items-center space-x-2 col-span-3">
+                        <Switch
+                            id="sms-reminders"
+                            checked={enableSmsReminders}
+                            onCheckedChange={setEnableSmsReminders}
+                        />
+                        <Label htmlFor="sms-reminders">
+                            {enableSmsReminders ? "Enabled" : "Disabled"}
+                        </Label>
+                    </div>
+                </div>
+                {enableSmsReminders && (
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="phone-number" className="text-right">
+                        Phone Number
+                        </Label>
+                        <Input
+                        id="phone-number"
+                        className="col-span-3"
+                        placeholder="(123) 456-7890"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        />
+                    </div>
+                )}
                 </div>
                 
                 <DialogFooter>
