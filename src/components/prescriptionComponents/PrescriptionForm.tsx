@@ -198,22 +198,6 @@ export function PrescriptionForm({ onSubmit, onCancel, initialValues = {} }: Pre
             </Label>
           </div>
         </div>
-        
-        {/* Phone Number field (conditional) */}
-        {enableSmsReminders && (
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="phone-number" className="text-right">
-              Phone Number
-            </Label>
-            <Input
-              id="phone-number"
-              className="col-span-3"
-              placeholder="(123) 456-7890"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-          </div>
-        )}
       </div>
       
       <div className="flex justify-end gap-4 mt-4">
