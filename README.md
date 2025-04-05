@@ -40,7 +40,7 @@ The app also streamlines the prescription renewal process with doctors and allow
 
 ## Setup Instructions (Will be setup in future sprints)
   In your terminal:
-    1. 'git clone https://github.com/aflam745/CS426-Health-App.git'
-    2. 'cd path/to/https://github.com/aflam745/CS426-Health-App.git'
-    3. 'npm install' to install dependencies
-    4. 'npm run dev' to start application
+    - 'git clone https://github.com/aflam745/CS426-Health-App.git'
+    - 'cd path/to/https://github.com/aflam745/CS426-Health-App.git'
+    - 'npm install' to install dependencies
+    - 'npm run dev' to start application
