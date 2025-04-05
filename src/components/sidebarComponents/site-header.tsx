@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 
 export function SiteHeader() {
   return (
@@ -8,6 +9,9 @@ export function SiteHeader() {
         <SidebarTrigger className="-ml-1 cursor-pointer transition-transform duration-200 hover:scale-120" />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
         <h1 className="font-medium">Health 2.0</h1>
+        <Button type="submit" className=" ml-auto cursor-pointer hover:scale-95">
+          Logout
+        </Button>
       </div>
     </header>
   )
