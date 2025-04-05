@@ -38,5 +38,8 @@ The app also streamlines the prescription renewal process with doctors and allow
 - Ability to create a new journal with a goal and optional reminder notifications.
 - Dropdown menu to switch between different tracked metrics.
 
-## Setup Instructions (Will be setup in future sprints)
--
+## Setup Instructions
+- 'git clone https://github.com/aflam745/CS426-Health-App.git'
+- 'cd path/to/CS426-Health-App'
+- 'npm install' to install dependencies
+- 'npm run dev' to start application
