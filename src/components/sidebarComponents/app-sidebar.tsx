@@ -20,7 +20,7 @@ const items = [
   },
   {
     title: "Journal",
-    url: "#",
+    url: "./journal",
     icon: NotebookPen,
   },
   {
