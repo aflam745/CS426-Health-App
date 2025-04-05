@@ -41,7 +41,7 @@ export function LogEntryForm({ metric, onCancel, onSubmit }: LogEntryFormProps) 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-xl shadow-sm bg-white">
       <div>
-        <Label>Value ({metric.unit})</Label>
+        <Label className="mb-2">Value ({metric.unit})</Label>
         <Input
           type="number"
           step="any"
@@ -53,12 +53,12 @@ export function LogEntryForm({ metric, onCancel, onSubmit }: LogEntryFormProps) 
       </div>
 
       <div>
-        <Label>Date</Label>
+        <Label className="mb-2">Date</Label>
         <DatePicker value={date} onChange={setDate} />
       </div>
 
       <div>
-        <Label>Note (optional)</Label>
+        <Label className="mb-2">Note (optional)</Label>
         <Textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
