@@ -6,14 +6,14 @@
 ## Team Name
 - Health 2.0 Team (Team 01)
 
-## 🛠️ Team Members
+## Team Members
 - **[Luke Walsh]** - GitHub: https://github.com/LukeJwalsh
 - **[Andrew Flammia]** - GitHub: https://github.com/aflam745
 - **[Owen Gibbons]** - GitHub: https://github.com/owen-gibbons
 - **[Mattheus Ferreira]** - GitHub: https://github.com/teuferr
 
 ## Overview
-**Health 2.0** is a mobile application designed to simplify prescription tracking, medication reminders, and health metric logging.  
+**Health 2.0** is a mobile application designed to simplify prescription tracking, medication reminders, and health metric logging.
 The app also streamlines the prescription renewal process with doctors and allows users to maintain a digital health journal.
 
 ## Core Features
@@ -38,7 +38,7 @@ The app also streamlines the prescription renewal process with doctors and allow
 - Ability to create a new journal with a goal and optional reminder notifications.
 - Dropdown menu to switch between different tracked metrics.
 
-## Setup Instructions (Will be setup in future sprints)
+## Setup Instructions
 - 'git clone https://github.com/aflam745/CS426-Health-App.git'
 - 'cd path/to/CS426-Health-App'
 - 'npm install' to install dependencies
