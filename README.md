@@ -39,7 +39,7 @@ The app also streamlines the prescription renewal process with doctors and allow
 - Dropdown menu to switch between different tracked metrics.
 
 ## Setup Instructions (Will be setup in future sprints)
-- ;git clone https://github.com/aflam745/CS426-Health-App.git'
-- 'cd path/to/https://github.com/aflam745/CS426-Health-App.git'
+- 'git clone https://github.com/aflam745/CS426-Health-App.git'
+- 'cd path/to/CS426-Health-App'
 - 'npm install' to install dependencies
 - 'npm run dev' to start application
