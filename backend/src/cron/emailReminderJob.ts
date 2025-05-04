@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 import { query } from '../db';
 
 async function sendRefillEmails() {
-  // 1) Fetch prescriptions due in 5 days
+  //Fetch prescriptions due in 5 days
   const reminders = await query<{
     user_id: number;
     email:   string;
@@ -14,7 +14,8 @@ async function sendRefillEmails() {
     SELECT p.user_id, p.name, p.next_refill_date, u.email
       FROM prescriptions p
       JOIN users u ON u.id = p.user_id
-     WHERE p.next_refill_date = CURRENT_DATE + INTERVAL '5 days'
+     WHERE p.next_refill_date::date > CURRENT_DATE
+      AND p.next_refill_date::date <= CURRENT_DATE + INTERVAL '5 days'
   `);
 
   if (!reminders.length) {
@@ -22,16 +23,16 @@ async function sendRefillEmails() {
     return;
   }
 
-  // 2) Create a Gmail transporter
+  // Create a Gmail transporter
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,      // your app-password
+      pass: process.env.GMAIL_PASS,
     }
   });
 
-  // 3) Send one email per reminder
+  // Send one email per reminder
   for (const r of reminders) {
     const mailOptions = {
       from:    `"HealthApp" <${process.env.GMAIL_USER}>`,
@@ -50,8 +51,18 @@ async function sendRefillEmails() {
   }
 }
 
-// Schedule the job to run every day at 8:00 AM server time
-cron.schedule('0 8 * * *', () => {
-  console.log('[EmailReminderJob] running at', new Date().toISOString());
-  sendRefillEmails().catch(e => console.error('[EmailReminderJob]', e));
-});
+// Schedule the job to run every day at 8:00 AM
+cron.schedule(
+  '0 8 * * *',
+  () => {
+    console.log(
+      '[EmailReminderJob] running at',
+      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+    );
+    sendRefillEmails().catch(e => console.error('[EmailReminderJob]', e));
+  },
+  {
+    timezone: 'America/New_York'    // interpret the schedule in EST/EDT
+  }
+);
+
