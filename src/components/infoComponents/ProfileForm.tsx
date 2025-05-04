@@ -1,9 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useParams } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
+import toast from 'react-hot-toast'
+import type { SubmitHandler } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -15,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { DatePicker } from "./DatePicker"
 import { Separator } from "@/components/ui/separator"
+import { useEffect, useState } from "react"
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -23,8 +26,12 @@ const formSchema = z.object({
   dateOfBirth: z.date(),
 })
 
+type FormValues = z.infer<typeof formSchema>
+
 export function ProfileForm() {
-  // 1. Define your form.
+  const { id } = useParams<{ id: string }>();
+  const userId = Number(id);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,13 +41,74 @@ export function ProfileForm() {
       dateOfBirth: new Date()
     },
   })
+  const [loading, setLoading] = useState(true);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    console.log(values)
-    // Reset the form with the new values.
-    form.reset(values)
-  }
+  useEffect(() => {
+    if (!userId) return;
+    async function loadUser() {
+      try {
+        const res = await fetch(`http://localhost:4000/api/users/${userId}`);
+        if (!res.ok) throw new Error('User not found')
+        const user = await res.json() as {
+          name: string
+          email: string
+          phone?: string
+          date_of_birth: string
+        }
+        form.reset({
+          name: user.name,
+          email: user.email,
+          phone: user.phone ?? '',
+          dateOfBirth: new Date(user.date_of_birth),
+        })
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadUser()
+  }, [userId, form])
+
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
+    try {
+      const res = await fetch(`http://localhost:4000/api/users/${userId}`, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          date_of_birth: values.dateOfBirth.toISOString().split('T')[0],
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || res.statusText);
+      }
+
+      const updated = await res.json() as {
+        name: string;
+        email: string;
+        phone?: string;
+        date_of_birth: string;
+      };
+
+      form.reset({
+        name: updated.name,
+        email: updated.email,
+        phone: updated.phone ?? '',
+        dateOfBirth: new Date(updated.date_of_birth),
+      });
+
+      toast.success('Profile successfully updated!')
+    } catch (e) {
+      console.error('Failed to update user:', e);
+    }
+  };
+
+  if (loading) return <p>Loading…</p>
 
   return (
     <>
