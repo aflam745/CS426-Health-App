@@ -24,5 +24,15 @@ services:
     depends_on:
       - db
 
+  notifier:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["node", "dist/cron/emailReminderJob.js"]
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+
 volumes:
   db-data:
