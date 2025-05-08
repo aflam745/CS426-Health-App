@@ -17,9 +17,9 @@ async function testGmail() {
   try {
     const info = await transporter.sendMail({
       from: `"HealthApp Test" <${process.env.GMAIL_USER}>`,
-      to:   'aflam745@gmail.com',           // my email address
+      to:   'aflam745@gmail.com', // my email address
       subject: 'Gmail SMTP Test',
-      text:    'If you see this, your Gmail SMTP is configured correctly!',
+      text:    'Gmail SMTP working!!!',
     });
     console.log('Test email sent, MessageId:', info.messageId);
   } catch (err: any) {

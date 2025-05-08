@@ -14,8 +14,9 @@ async function sendRefillEmails() {
     SELECT p.user_id, p.name, p.next_refill_date, u.email
       FROM prescriptions p
       JOIN users u ON u.id = p.user_id
-     WHERE p.next_refill_date::date > CURRENT_DATE
+     WHERE p.next_refill_date::date >= CURRENT_DATE
       AND p.next_refill_date::date <= CURRENT_DATE + INTERVAL '5 days'
+      AND u.notifications
   `);
 
   if (!reminders.length) {
@@ -35,10 +36,10 @@ async function sendRefillEmails() {
   // Send one email per reminder
   for (const r of reminders) {
     const mailOptions = {
-      from:    `"HealthApp" <${process.env.GMAIL_USER}>`,
+      from:    `"Health2.0" <${process.env.GMAIL_USER}>`,
       to:       r.email,
       subject: 'Prescription Refill Reminder',
-      text:    `Hi! Your prescription "${r.name}" is due for refill on ${r.next_refill_date}.`,
+      text:    `Hi! Your prescription "${r.name}" is due for refill on ${r.next_refill_date}. Don't for get to refill it!`,
     };
     try {
       const info = await transporter.sendMail(mailOptions);
