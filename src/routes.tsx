@@ -9,10 +9,10 @@ export default function AppRoutes() {
     <Routes>
       {/* <Route path="/" element={} /> */}
       <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="/login" element={<LoginForm />} /> 
+      <Route path="/login" element={<LoginForm />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/prescriptions" element={<PrescriptionsPage/>} />
-      <Route path="/profile" element={<ProfileForm />} />
+      <Route path="/profile/:id" element={<ProfileForm />} />
       <Route path="/journal" element={<JournalPage/>} />
     </Routes>
   );
