@@ -35,6 +35,24 @@ router.get('/', async (_req, res, next) => {
   } catch (err) { next(err) }
 });
 
+// Get User by id
+router.get<{ id: string }>('/:id', async (req, res, next) => {
+  const userId = Number(req.params.id);
+  try {
+    const rows = await query<IUser>(
+      'SELECT * FROM users WHERE id = $1',
+      [userId]
+    );
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    res.json(rows[0]);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Update
 router.put<{ id: string }>('/:id', async (req, res, next) => {
   const userId = Number(req.params.id);
