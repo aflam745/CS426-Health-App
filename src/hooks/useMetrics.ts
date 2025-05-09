@@ -1,4 +1,3 @@
-// src/hooks/useMetrics.ts
 import { useState, useEffect, useCallback } from "react"
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000"
@@ -37,6 +36,7 @@ export function useMetrics(userId: number) {
   const [loading, setLoading] = useState<boolean>(false)
   const [summary, setSummary] = useState<SummaryData | null>(null)
 
+  // Fetch all metric types for the user
   const loadTypes = useCallback(async () => {
     setLoading(true)
     try {
@@ -49,6 +49,7 @@ export function useMetrics(userId: number) {
     }
   }, [userId])
 
+  // Fetch all entries for a specific metric type
   const loadEntries = useCallback(async (metricTypeId: number) => {
     setLoading(true)
     try {
@@ -61,6 +62,7 @@ export function useMetrics(userId: number) {
     }
   }, [])
 
+  // Fetch the summary data (daily and overall average) for a metric type
   const loadSummary = useCallback(async (metricTypeId: number) => {
     const res = await fetch(`${API_BASE}/api/metrics/daily-averages/${metricTypeId}`)
     if (!res.ok) throw new Error("Failed to load summary")
@@ -68,6 +70,7 @@ export function useMetrics(userId: number) {
     setSummary(data)
   }, [])
 
+  // Add a new metric type for the user
   const addMetricType = useCallback(
     async (name: string, unit: string | null, goal: number | null) => {
       const res = await fetch(`${API_BASE}/api/metrics/types`, {
@@ -75,10 +78,12 @@ export function useMetrics(userId: number) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, name, unit, goal }),
       })
+
       if (!res.ok) {
         if (res.status === 409) throw new Error("Metric name already exists.")
         else throw new Error("Failed to create metric type")
       }
+
       const newType = (await res.json()) as MetricType
       setTypes((prev) => [...prev, newType])
       return newType
@@ -86,18 +91,25 @@ export function useMetrics(userId: number) {
     [userId]
   )
 
+  // Delete a metric type and its associated entries
   const deleteMetricType = useCallback(async (metricTypeId: number) => {
     const res = await fetch(`${API_BASE}/api/metrics/types/${metricTypeId}`, {
       method: "DELETE",
     })
+
     if (!res.ok) throw new Error("Failed to delete metric type")
+
+    // Remove from metric types
     setTypes((prev) => prev.filter((t) => t.id !== metricTypeId))
+
+    // Remove associated entries
     setEntries((prev) => {
       const { [metricTypeId]: _, ...rest } = prev
       return rest
     })
   }, [])
 
+  // Add a new entry to a metric
   const addEntry = useCallback(
     async (metricTypeId: number, entry_date: string, value: number, note?: string) => {
       const res = await fetch(`${API_BASE}/api/metrics/entries`, {
@@ -105,21 +117,28 @@ export function useMetrics(userId: number) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ metric_type_id: metricTypeId, entry_date, value, note }),
       })
+
       if (!res.ok) throw new Error("Failed to create entry")
+
       const newEntry = (await res.json()) as MetricEntry
+
+      // Add new entry to the beginning of the list
       setEntries((prev) => ({
         ...prev,
         [metricTypeId]: [newEntry, ...(prev[metricTypeId] || [])],
       }))
+
       return newEntry
     },
     []
   )
 
+  // Load metric types on component mount
   useEffect(() => {
     loadTypes()
   }, [loadTypes])
 
+  // Return all state and operations for use in components
   return {
     types,
     entries,

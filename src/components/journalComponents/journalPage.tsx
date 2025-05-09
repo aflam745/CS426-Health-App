@@ -1,8 +1,9 @@
-// src/components/journalComponents/JournalPage.tsx
+// React & UI library imports
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+// Custom hooks and components
 import { useMetrics, MetricEntry } from "@/hooks/useMetrics"
 import { MetricDropdown } from "./metricDropdown"
 import { MetricSummaryCard } from "./metricSummaryCard"
@@ -10,26 +11,32 @@ import { MetricChart } from "./metricChart"
 import { LogEntryForm } from "./logEntryForm"
 import { LogEntryList } from "./logEntryList"
 import { AddMetricForm } from "./addMetricForm"
+import { useAuth } from "@/context/authContext"
 
 export default function JournalPage() {
-  const userId = 1
+  // Get authenticated user
+  const { user } = useAuth()
+  const userId = user?.id
+
+  // Fetch metrics-related data and functions from custom hook
   const {
-    types,
-    entries,
-    summary,
-    loading,
-    loadEntries,
-    loadSummary,
-    addMetricType,
-    deleteMetricType,
-    addEntry,
+    types,              // All metric types
+    entries,            // Metric entries grouped by type ID
+    summary,            // Summary stats like overall average
+    loading,            // Loading state
+    loadEntries,        // Function to fetch entries
+    loadSummary,        // Function to fetch summary
+    addMetricType,      // Add a new metric type
+    deleteMetricType,   // Delete a metric type
+    addEntry,           // Add a new metric entry
   } = useMetrics(userId)
 
+  // UI state
   const [selectedMetricId, setSelectedMetricId] = useState<number | undefined>()
-  const [showForm, setShowForm] = useState(false)
-  const [showAddMetric, setShowAddMetric] = useState(false)
+  const [showForm, setShowForm] = useState(false)            // Controls Add Entry form
+  const [showAddMetric, setShowAddMetric] = useState(false)  // Controls Add Metric form
 
-  // Load entries & summary when a metric is selected
+  // Load entries and summary when a metric is selected
   useEffect(() => {
     if (selectedMetricId != null) {
       loadEntries(selectedMetricId)
@@ -37,17 +44,18 @@ export default function JournalPage() {
     }
   }, [selectedMetricId, loadEntries, loadSummary])
 
-  // Auto-select first metric on initial load
+  // Automatically select the first available metric when metrics are loaded
   useEffect(() => {
     if (types.length > 0 && selectedMetricId == null) {
       setSelectedMetricId(types[0].id)
     }
   }, [types, selectedMetricId])
 
-  if (loading) {
-    return <div className="p-4 max-w-4xl mx-auto">Loading…</div>
-  }
+  // Handle edge cases
+  if (!userId) return <div>Loading user...</div>
+  if (loading) return <div className="p-4 max-w-4xl mx-auto">Loading…</div>
 
+  // Show prompt to add a metric if none exist
   if (types.length === 0 && !showAddMetric) {
     return (
       <div className="p-4 max-w-4xl mx-auto space-y-6">
@@ -61,31 +69,28 @@ export default function JournalPage() {
     )
   }
 
-  // Raw entries for the selected metric
+  // Process entries and chart data for the selected metric
   const rawEntries: MetricEntry[] =
     selectedMetricId != null ? entries[selectedMetricId] || [] : []
 
-  // Normalize date for list & chart
   const entryListItems = rawEntries.map((e) => ({
     date: e.entry_date.split("T")[0],
     value: e.value,
     note: e.note ?? "",
   }))
+
   const chartData = entryListItems.map((e) => ({
     date: e.date,
     value: e.value,
   }))
 
-  // Find the selected metric type
   const metricType = types.find((t) => t.id === selectedMetricId)
-
-  // Summary stats from API
   const average = summary?.overall_avg ?? 0
   const latest = rawEntries[0]?.value ?? 0
 
   return (
     <div className="p-4 max-w-4xl mx-auto space-y-6">
-      {/* Top Controls */}
+      {/* Header controls: metric selector + add/delete buttons */}
       <div className="flex items-center justify-between space-x-4">
         {metricType && (
           <div className="flex space-x-2">
@@ -104,17 +109,14 @@ export default function JournalPage() {
             <Button
               variant="destructive"
               onClick={() => {
-                if (
-                  window.confirm("Delete this metric and all its entries?")
-                ) {
+                if (window.confirm("Delete this metric and all its entries?")) {
                   deleteMetricType(selectedMetricId!).then(() => {
-                    const remaining = types.filter(
-                      (t) => t.id !== selectedMetricId
-                    )
+                    const remaining = types.filter((t) => t.id !== selectedMetricId)
                     if (remaining.length > 0) {
-                      setSelectedMetricId(remaining[0].id)
-                      loadEntries(remaining[0].id)
-                      loadSummary(remaining[0].id)
+                      const first = remaining[0]
+                      setSelectedMetricId(first.id)
+                      loadEntries(first.id)
+                      loadSummary(first.id)
                     } else {
                       setSelectedMetricId(undefined)
                     }
@@ -128,6 +130,7 @@ export default function JournalPage() {
           </div>
         )}
 
+        {/* Toggle add metric form */}
         {!showAddMetric ? (
           <Button variant="outline" onClick={() => setShowAddMetric(true)}>
             + Add New Metric
@@ -146,9 +149,10 @@ export default function JournalPage() {
         )}
       </div>
 
-      {/* Main Content */}
+      {/* Main content: summary, chart, entry form, and log list */}
       {metricType && (
         <>
+          {/* Summary card showing goal, average, and latest */}
           <MetricSummaryCard
             name={metricType.name}
             unit={metricType.unit ?? ""}
@@ -157,17 +161,17 @@ export default function JournalPage() {
             latest={latest}
           />
 
+          {/* Trend chart */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-red-600">
-                {metricType.name} Trends
-              </CardTitle>
+              <CardTitle className="text-red-600">{metricType.name} Trends</CardTitle>
             </CardHeader>
             <CardContent>
               <MetricChart entries={chartData} />
             </CardContent>
           </Card>
 
+          {/* Toggle log entry form */}
           {!showForm ? (
             <Button className="w-full" onClick={() => setShowForm(true)}>
               + Add Entry
@@ -181,16 +185,12 @@ export default function JournalPage() {
               }}
               onCancel={() => setShowForm(false)}
               onSubmit={({ date, value, note }) =>
-                addEntry(
-                  selectedMetricId!,
-                  date,
-                  value,
-                  note
-                ).then(() => setShowForm(false))
+                addEntry(selectedMetricId!, date, value, note).then(() => setShowForm(false))
               }
             />
           )}
 
+          {/* Log entry list below the form */}
           <LogEntryList entries={entryListItems} unit={metricType.unit ?? ""} />
         </>
       )}
