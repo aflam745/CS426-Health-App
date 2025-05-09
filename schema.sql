@@ -2,13 +2,14 @@
 
 -- 1. Users
 CREATE TABLE users (
-  id            SERIAL PRIMARY KEY,
-  name          VARCHAR(100) NOT NULL,
-  email         VARCHAR(255) NOT NULL UNIQUE,
-  phone         VARCHAR(20),
-  date_of_birth DATE NOT NULL,
-  created_at    TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+  id             SERIAL PRIMARY KEY,
+  name           VARCHAR(100) NOT NULL,
+  email          VARCHAR(255) NOT NULL UNIQUE,
+  phone          VARCHAR(20),
+  date_of_birth  DATE NOT NULL,
+  notifications  BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at     TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at     TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- 2.a Metric types

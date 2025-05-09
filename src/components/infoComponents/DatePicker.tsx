@@ -18,11 +18,15 @@ interface DatePickerProps {
   onChange: (date: Date | null) => void
 }
 
-export function DatePicker({ value, onChange }: DatePickerProps) {
+export const DatePicker = React.forwardRef<
+  HTMLButtonElement,
+  DatePickerProps
+>(({ value, onChange }, ref) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          ref={ref}
           variant="outline"
           className={cn(
             "w-[280px] justify-start text-left font-normal",
@@ -37,14 +41,11 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
         <Calendar
           mode="single"
           selected={value ?? undefined}
-          onSelect={(date) => onChange(date ?? null)} 
+          onSelect={(date) => onChange(date ?? null)}
           initialFocus
-          // Optional props:
-          // captionLayout="dropdown-buttons"
-          // fromDate={new Date(1900, 0, 1)}
-          // toDate={new Date(2030, 11, 31)}
         />
       </PopoverContent>
     </Popover>
   )
-}
+})
+DatePicker.displayName = "DatePicker"

@@ -2,6 +2,8 @@
 import { Router } from 'express';
 import { query } from '../db';
 
+import { scheduleRefillReminder } from '../lib/notifier';
+
 interface Prescription {
   id: number;
   user_id: number;
@@ -34,6 +36,7 @@ router.get('/:userId', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   const p = req.body as Partial<Prescription>;
   try {
+    let prescription: Prescription;
     if (p.id) {
       // update
       const rows = await query<Prescription>(
@@ -45,7 +48,8 @@ router.post('/', async (req, res, next) => {
         [p.id, p.name, p.dosage, p.frequency, p.supply_remaining,
          p.next_refill_date, p.prescribing_doctor, p.pharmacy, p.instructions]
       );
-      res.json(rows[0]);
+      prescription = rows[0];
+      res.json(prescription);
     } else {
       // insert
       const rows = await query<Prescription>(
@@ -56,7 +60,36 @@ router.post('/', async (req, res, next) => {
         [p.user_id, p.name, p.dosage, p.frequency, p.supply_remaining,
          p.next_refill_date, p.prescribing_doctor, p.pharmacy, p.instructions]
       );
-      res.status(201).json(rows[0]);
+      prescription = rows[0];
+      res.status(201).json(prescription);
+    }
+    // Schedule notification for this prescription
+    if (prescription.next_refill_date) {
+      // pull both email & notifications flag
+      const userRows = await query<{
+        email: string;
+        notifications: boolean;
+      }>(
+        `SELECT email, notifications
+          FROM users
+          WHERE id = $1`,
+        [prescription.user_id]
+      );
+
+      const user = userRows[0];
+      if (user?.email && user.notifications) {
+        scheduleRefillReminder(
+          user.email,
+          prescription.name,
+          prescription.next_refill_date
+        ).catch((err: any) =>
+          console.error('[Notifier] failed to schedule refill reminder:', err)
+        );
+      } else {
+        console.log(
+          `[Notifier] skipping scheduling for user ${prescription.user_id} because notifications are off`
+        );
+      }
     }
   } catch (err) { next(err) }
 });
