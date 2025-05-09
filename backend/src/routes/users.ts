@@ -56,19 +56,20 @@ router.get<{ id: string }>('/:id', async (req, res, next) => {
 // Update
 router.put<{ id: string }>('/:id', async (req, res, next) => {
   const userId = Number(req.params.id);
-  const { name, email, phone, date_of_birth } = req.body;
+  const { name, email, phone, notifications, date_of_birth } = req.body;
 
   try {
     const rows = await query<IUser>(`
       UPDATE users
-         SET name          = $2,
-             email         = $3,
-             phone         = $4,
-             date_of_birth = $5,
-             updated_at    = now()
-       WHERE id            = $1
+         SET name= $2,
+             email= $3,
+             phone= $4,
+             notifications= $5,
+             date_of_birth= $6,
+             updated_at= now()
+       WHERE id= $1
     RETURNING *`,
-      [userId, name, email, phone, date_of_birth]
+      [userId, name, email, phone, notifications, date_of_birth]
     );
 
     if (rows.length === 0) {
