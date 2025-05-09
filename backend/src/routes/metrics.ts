@@ -34,14 +34,35 @@ router.post('/types', async (req, res, next) => {
 router.post('/entries', async (req, res, next) => {
   const { metric_type_id, entry_date, value, note } = req.body as Partial<MetricEntry>;
   try {
+    // Get threshold for this metric type
+    const threshold = await query<{
+      min_value: number | null;
+      max_value: number | null;
+    }>(
+      `SELECT min_value, max_value
+       FROM metric_thresholds
+       WHERE metric_type_id = $1`,
+      [metric_type_id]
+    );
+    let flag = 0;
+    if (threshold.length > 0) {
+      const { min_value, max_value } = threshold[0];
+      if ((min_value !== null && value! < min_value) ||
+          (max_value !== null && value! > max_value)) {
+        flag = 1; // red flag
+      }
+    }
     const rows = await query<MetricEntry>(
       `INSERT INTO metric_entries
-         (metric_type_id,entry_date,value,note)
-       VALUES ($1,$2,$3,$4) RETURNING *`,
-      [metric_type_id, entry_date, value, note]
+         (metric_type_id, entry_date, value, flag, note)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [metric_type_id, entry_date, value, flag, note]
     );
     res.status(201).json(rows[0]);
-  } catch (err) { next(err) }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // List Entries
@@ -56,5 +77,21 @@ router.get('/entries/:metricTypeId', async (req, res, next) => {
     res.json(rows);
   } catch (err) { next(err) }
 });
+
+// Aggregate Red Flags
+router.get('/flags/:userId', async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT mt.name, COUNT(rf.id) as flag_count
+       FROM red_flags rf
+       JOIN metric_types mt ON rf.metric_type_id = mt.id
+       WHERE rf.user_id = $1
+       GROUP BY mt.name`,
+      [req.params.userId]
+    );
+    res.json(result);
+  } catch (err) { next(err); }
+});
+
 
 export default router;

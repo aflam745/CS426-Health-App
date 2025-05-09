@@ -28,6 +28,7 @@ CREATE TABLE metric_entries (
                  REFERENCES metric_types(id) ON DELETE CASCADE,
   entry_date     DATE    NOT NULL,
   value          NUMERIC NOT NULL,
+  flag           NUMERIC,
   note           TEXT,
   created_at     TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
@@ -48,3 +49,22 @@ CREATE TABLE prescriptions (
   created_at         TIMESTAMP WITH TIME ZONE DEFAULT now(),
   updated_at         TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+
+-- 4. Metric Thresholds
+CREATE TABLE metric_thresholds (
+  id              SERIAL PRIMARY KEY,
+  user_id         INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  metric_type_id  INT NOT NULL REFERENCES metric_types(id) ON DELETE CASCADE,
+  min_value       NUMERIC,
+  max_value       NUMERIC,
+  UNIQUE(user_id, metric_type_id)
+)
+
+-- 5. Red Flags
+CREATE TABLE red_flags (
+  id               SERIAL PRIMARY KEY,
+  user_id          INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  metric_entry_id  INT NOT NULL REFERENCES metric_entries(id) ON DELETE CASCADE,
+  metric_type_id   INT NOT NULL REFERENCES metric_types(id) ON DELETE CASCADE,
+  created_at       TIMESTAMP WITH TIME ZONE DEFAULT now()
+)
