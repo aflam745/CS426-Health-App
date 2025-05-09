@@ -2,14 +2,17 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-const mockReminders = [
-  "Refill Prescription",
-  "Take blood pressure medicine",
-  "Record blood sugar",
-  "Contact doctor for follow-up",
-]
+type Prescription = {
+  id: number
+  name: string
+  next_refill_date?: string
+  dosage?: string
+  frequency?: string
+  pharmacy?: string
+  instructions?: string
+}
 
-export function RemindersCard() {
+export function RemindersCard({ reminders }: { reminders: Prescription[] }) {
   return (
     <Card>
       <CardHeader>
@@ -17,9 +20,15 @@ export function RemindersCard() {
       </CardHeader>
       <CardContent>
         <ul className="list-disc pl-4 space-y-1">
-          {mockReminders.map((reminder, idx) => (
-            <li key={idx}>{reminder}</li>
-          ))}
+          {reminders.length > 0 ? (
+            reminders.map((rx) => (
+              <li key={rx.id}>
+                {rx.name} – Refill by {new Date(rx.next_refill_date!).toLocaleDateString("en-US")}
+              </li>
+            ))
+          ) : (
+            <li>No upcoming reminders</li>
+          )}
         </ul>
       </CardContent>
     </Card>
