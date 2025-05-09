@@ -63,22 +63,31 @@ router.post('/', async (req, res, next) => {
       prescription = rows[0];
       res.status(201).json(prescription);
     }
-
     // Schedule notification for this prescription
     if (prescription.next_refill_date) {
-      // Lookup user email
-      const userRows = await query<{ email: string }>(
-        'SELECT email FROM users WHERE id = $1',
+      // pull both email & notifications flag
+      const userRows = await query<{
+        email: string;
+        notifications: boolean;
+      }>(
+        `SELECT email, notifications
+          FROM users
+          WHERE id = $1`,
         [prescription.user_id]
       );
-      const userEmail = userRows[0]?.email;
-      if (userEmail) {
+
+      const user = userRows[0];
+      if (user?.email && user.notifications) {
         scheduleRefillReminder(
-          userEmail,
+          user.email,
           prescription.name,
           prescription.next_refill_date
         ).catch((err: any) =>
           console.error('[Notifier] failed to schedule refill reminder:', err)
+        );
+      } else {
+        console.log(
+          `[Notifier] skipping scheduling for user ${prescription.user_id} because notifications are off`
         );
       }
     }
