@@ -1,11 +1,14 @@
 "use client"
 
+// Import validation resolver and schema tools
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useParams } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import toast from 'react-hot-toast'
 import type { SubmitHandler } from 'react-hook-form'
+
+// UI components
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -20,7 +23,7 @@ import { Separator } from "@/components/ui/separator"
 import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
 
-// Extend schema to include notifications
+// Define form validation schema with Zod, including notifications toggle
 const formSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -32,9 +35,11 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export function ProfileForm() {
+  // Extract user ID from route params
   const { id } = useParams<{ id: string }>()
   const userId = Number(id)
 
+  // Initialize react-hook-form with the Zod schema as resolver
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,12 +52,15 @@ export function ProfileForm() {
   })
   const [loading, setLoading] = useState(true)
 
+  // Load user data on mount (or when userId changes)
   useEffect(() => {
     if (!userId) return
     async function loadUser() {
       try {
+        // Fetch user profile from API
         const res = await fetch(`http://localhost:4000/api/users/${userId}`)
         if (!res.ok) throw new Error('User not found')
+
         const user = await res.json() as {
           name: string
           email: string
@@ -60,6 +68,8 @@ export function ProfileForm() {
           date_of_birth: string
           notifications: boolean
         }
+
+        // Reset form fields with fetched data
         form.reset({
           name: user.name,
           email: user.email,
@@ -76,8 +86,10 @@ export function ProfileForm() {
     loadUser()
   }, [userId, form])
 
+  // Form submission handler
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     try {
+      // Send PUT request to update user
       const res = await fetch(`http://localhost:4000/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -95,6 +107,7 @@ export function ProfileForm() {
         throw new Error(err.error || res.statusText)
       }
 
+      // Update form with new data after successful save
       const updated = await res.json() as {
         name: string
         email: string
@@ -111,16 +124,19 @@ export function ProfileForm() {
         notifications: updated.notifications,
       })
 
+      // Show success toast
       toast.success('Profile successfully updated!')
     } catch (e) {
       console.error('Failed to update user:', e)
     }
   }
 
+  // Show loading state while fetching user
   if (loading) return <p>Loading…</p>
 
   return (
     <>
+      {/* Form Header */}
       <div className="text-left">
         <h2 className="text-xl font-bold">Profile</h2>
         <p className="text-sm text-muted-foreground">
@@ -130,9 +146,10 @@ export function ProfileForm() {
 
       <Separator className="my-4" />
 
+      {/* Render form fields using UI components */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Name, Email, Phone, DOB fields... */}
+          {/* Name Field */}
           <FormField
             control={form.control}
             name="name"
@@ -145,6 +162,8 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+
+          {/* Email Field */}
           <FormField
             control={form.control}
             name="email"
@@ -157,6 +176,8 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+
+          {/* Phone Number Field */}
           <FormField
             control={form.control}
             name="phone"
@@ -169,6 +190,8 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+
+          {/* Date of Birth Field */}
           <FormField
             control={form.control}
             name="dateOfBirth"
@@ -181,6 +204,8 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+
+          {/* Notifications Switch */}
           <FormField
             control={form.control}
             name="notifications"
@@ -197,6 +222,8 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+
+          {/* Submit Button */}
           <Button type="submit" className="cursor-pointer hover:scale-95">
             Update
           </Button>
