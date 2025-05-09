@@ -3,31 +3,57 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LineChartWrapper } from "@/components/ui/line-chart"
 import type { ChartData, ChartOptions, TooltipItem } from "chart.js"
-import { MetricKey } from "./homeCard"
 
-const mockHealthData = [
-  { date: "2025-01-01", weight: 180, bloodPressure: 120, bloodSugar: 90, heartRate: 7,  },
-  { date: "2025-01-02", weight: 179, bloodPressure: 118, bloodSugar: 95, heartRate: 74 },
-  { date: "2025-01-03", weight: 181, bloodPressure: 115, bloodSugar: 100, heartRate: 75 },
-  { date: "2025-01-04", weight: 180, bloodPressure: 117, bloodSugar: 92, heartRate: 73 },
-]
+type MetricEntry = {
+  metric_type_id: number
+  entry_date: string
+  value: number
+  note?: string
+  created_at: string
+}
+
+type MetricType = {
+  id: number
+  name: string
+}
 
 function formatLabel(key: string) {
   return key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())
 }
 
-export function HealthChartCard({ selectedMetric }: { selectedMetric: MetricKey }) {
-  const labels = mockHealthData.map((item) =>
-    new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+export function HealthChartCard({
+  selectedMetric,
+  data,
+}: {
+  selectedMetric: MetricType | null
+  data: MetricEntry[]
+}) {
+  if (!selectedMetric || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{selectedMetric?.name ? formatLabel(selectedMetric.name) : "Health Metric"}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Begin journaling your health to track your progress.
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const formattedLabel = formatLabel(selectedMetric.name)
+  const labels = data.map((item) =>
+    new Date(item.entry_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
   )
-  const dataValues = mockHealthData.map((item) => item[selectedMetric])
-  const formattedMetricLabel = formatLabel(selectedMetric)
+  const dataValues = data.map((item) => item.value)
 
   const chartData: ChartData<"line"> = {
     labels,
     datasets: [
       {
-        label: formattedMetricLabel,
+        label: formattedLabel,
         data: dataValues,
         borderColor: "#800020",
         backgroundColor: "rgba(128, 0, 32, 0.2)",
@@ -48,7 +74,7 @@ export function HealthChartCard({ selectedMetric }: { selectedMetric: MetricKey 
       legend: { display: false },
       title: {
         display: true,
-        text: `${formattedMetricLabel} Over Time`,
+        text: `${formattedLabel} Over Time`,
         color: "black",
         font: { size: 20, weight: "bold" },
       },
@@ -56,7 +82,7 @@ export function HealthChartCard({ selectedMetric }: { selectedMetric: MetricKey 
         callbacks: {
           label: function (context: TooltipItem<"line">) {
             const value = context.raw
-            return `${formattedMetricLabel}: ${value}`
+            return `${formattedLabel}: ${value}`
           },
         },
       },
@@ -68,7 +94,7 @@ export function HealthChartCard({ selectedMetric }: { selectedMetric: MetricKey 
         ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 },
       },
       y: {
-        title: { display: true, text: formattedMetricLabel },
+        title: { display: true, text: formattedLabel },
       },
     },
   }
