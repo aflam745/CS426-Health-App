@@ -1,73 +1,50 @@
+// src/components/journalComponents/logEntryForm.tsx
 import { useState } from "react"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { DatePicker } from "../infoComponents/DatePicker"
 
-interface LogEntry {
-  date: string
-  value: number
-  note?: string
-}
-
-interface LogEntryFormProps {
-  metric: {
-    id: string
-    name: string
-    unit: string
-  }
+export interface LogEntryFormProps {
+  metric: { id: string; name: string; unit: string }
   onCancel: () => void
-  onSubmit: (entry: LogEntry) => void
+  onSubmit: (entry: { date: string; value: number; note?: string }) => Promise<void>
 }
 
 export function LogEntryForm({ metric, onCancel, onSubmit }: LogEntryFormProps) {
+  const [date, setDate] = useState<string>(new Date().toISOString().split("T")[0])
   const [value, setValue] = useState("")
   const [note, setNote] = useState("")
-  const [date, setDate] = useState<Date | null>(new Date())
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!value || !date) return
-
-    onSubmit({
-      date: date.toISOString().split("T")[0],
-      value: parseFloat(value),
-      note: note.trim(),
-    })
-
+    const parsedValue = parseFloat(value)
+    if (isNaN(parsedValue)) return
+    await onSubmit({ date, value: parsedValue, note })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-xl shadow-sm bg-white">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label className="mb-2">Value ({metric.unit})</Label>
+        <label className="block text-sm font-medium">Date</label>
+        <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">
+          {metric.name} ({metric.unit})
+        </label>
         <Input
           type="number"
-          step="any"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder={`Enter ${metric.name.toLowerCase()} value`}
-          required
+          placeholder={`Enter ${metric.name}`}
         />
       </div>
-
       <div>
-        <Label className="mb-2">Date</Label>
-        <DatePicker value={date} onChange={setDate} />
+        <label className="block text-sm font-medium">Note (optional)</label>
+        <Textarea value={note} onChange={(e) => setNote(e.target.value)} />
       </div>
-
-      <div>
-        <Label className="mb-2">Note (optional)</Label>
-        <Textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Add any notes or observations"
-        />
-      </div>
-
-      <div className="flex justify-between">
-        <Button variant="outline" type="button" onClick={onCancel}>
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
         <Button type="submit">Save Entry</Button>

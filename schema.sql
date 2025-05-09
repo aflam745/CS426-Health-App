@@ -17,6 +17,8 @@ CREATE TABLE metric_types (
   user_id    INT NOT NULL
              REFERENCES users(id) ON DELETE CASCADE,
   name       VARCHAR(100) NOT NULL,
+  unit       VARCHAR(50),     
+  goal       NUMERIC,          
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   UNIQUE(user_id, name)
 );

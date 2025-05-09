@@ -1,40 +1,35 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { format } from "date-fns"
+// src/components/journalComponents/logEntryList.tsx
+import { format, parseISO } from "date-fns"
 
-interface LogEntry {
-  date: string 
+interface Entry {
+  date: string
   value: number
   note?: string
 }
 
-interface LogEntryListProps {
-  entries: LogEntry[]
+export function LogEntryList({
+  entries,
+  unit,
+}: {
+  entries: Entry[]
   unit: string
-}
-
-export function LogEntryList({ entries, unit }: LogEntryListProps) {
-  // Sort by date descending
-  const sorted = [...entries].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
-
+}) {
   return (
-    <div className="space-y-3">
-      {sorted.map((entry, index) => (
-        <Card key={index}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-medium text-red-600">
-              {entry.value} {unit}
-            </CardTitle>
-            <Badge variant="outline">{format(new Date(entry.date), "PPP")}</Badge>
-          </CardHeader>
+    <div className="space-y-4">
+      {entries.map((entry, index) => (
+        <div key={index} className="border p-4 rounded-md">
+          <div className="text-lg font-semibold">
+            {entry.value} {unit}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {format(parseISO(entry.date), "PPPP")}
+          </div>
           {entry.note && (
-            <CardContent className="text-sm text-muted-foreground">
+            <div className="mt-2 text-sm">
               Note: {entry.note}
-            </CardContent>
+            </div>
           )}
-        </Card>
+        </div>
       ))}
     </div>
   )
