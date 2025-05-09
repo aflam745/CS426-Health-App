@@ -1,63 +1,44 @@
+// UI card components used to layout the summary
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { format, parseISO } from "date-fns"
 
-interface Entry {
-  date: string
-  value: number
-  note?: string
+// Props interface for the MetricSummaryCard
+export interface MetricSummaryCardProps {
+  name: string        // Metric name (e.g., "Heart Rate")
+  unit: string        // Unit of measurement (e.g., "bpm")
+  goal: number        // Target goal value for the metric
+  average: number     // Average value of entries
+  latest: number      // Most recent entry value
 }
 
-interface MetricSummaryCardProps {
-  metric: {
-    name: string
-    unit: string
-    goal: number
-    entries: Entry[]
-  }
-}
-
-export function MetricSummaryCard({ metric }: MetricSummaryCardProps) {
-  const entries = metric.entries
-  const latest = entries
-    .slice()
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
-
-  const avg =
-    entries.reduce((sum, e) => sum + e.value, 0) / (entries.length || 1)
-  const isAboveGoal = avg > metric.goal
+// Component to display a summary overview of a metric
+export function MetricSummaryCard({
+  name,
+  unit,
+  goal,
+  average,
+  latest,
+}: MetricSummaryCardProps) {
+  // Determine status based on goal and average value
+  const status =
+    goal === 0           // If no goal is set
+      ? "No Goal"
+      : average >= goal  // Compare average to goal
+      ? "Above Goal"
+      : "Below Goal"
 
   return (
     <Card>
+      {/* Card header with the metric name */}
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>{metric.name} Overview</span>
-          {entries.length > 0 && (
-            <Badge variant={isAboveGoal ? "destructive" : "default"}>
-              {isAboveGoal ? "Above Goal" : "On Track"}
-            </Badge>
-          )}
-        </CardTitle>
+        <CardTitle>{name} Overview</CardTitle>
       </CardHeader>
+
+      {/* Card content with goal, average, and latest values */}
       <CardContent className="space-y-2">
-        <p>
-          <strong>Goal:</strong> {metric.goal} {metric.unit}
-        </p>
-        <p>
-          <strong>Average:</strong> {avg.toFixed(1)} {metric.unit}
-        </p>
-        {latest ? (
-          <>
-            <p>
-              <strong>Latest Entry:</strong> {latest.value} {metric.unit}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {format(parseISO(latest.date), "PPP")}
-            </p>
-          </>
-        ) : (
-          <p className="text-sm text-muted-foreground">No entries yet.</p>
-        )}
+        <div>Status: <strong>{status}</strong></div>
+        <div>Goal: <strong>{goal} {unit}</strong></div>
+        <div>Average: <strong>{average.toFixed(1)} {unit}</strong></div>
+        <div>Latest Entry: <strong>{latest} {unit}</strong></div>
       </CardContent>
     </Card>
   )

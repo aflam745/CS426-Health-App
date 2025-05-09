@@ -1,76 +1,83 @@
+// React state hook
 import { useState } from "react"
-import { Input } from "@/components/ui/input"
+
+// UI components
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { DatePicker } from "../infoComponents/DatePicker"
 
-interface LogEntry {
-  date: string
-  value: number
-  note?: string
-}
-
-interface LogEntryFormProps {
+// Props for the LogEntryForm component
+export interface LogEntryFormProps {
   metric: {
-    id: string
-    name: string
-    unit: string
+    id: string          // Metric identifier (string form)
+    name: string        // Metric name (e.g., Heart Rate)
+    unit: string        // Unit associated with the metric (e.g., bpm)
   }
-  onCancel: () => void
-  onSubmit: (entry: LogEntry) => void
+  onCancel: () => void  // Function called when the cancel button is clicked
+  onSubmit: (entry: {
+    date: string        // Entry date (YYYY-MM-DD format)
+    value: number       // Numerical value entered by user
+    note?: string       // Optional note for the entry
+  }) => Promise<void>   // Async function to handle form submission
 }
 
+// Component for submitting a new metric entry
 export function LogEntryForm({ metric, onCancel, onSubmit }: LogEntryFormProps) {
+  // Form state: date (default to today), value (string for input), and optional note
+  const [date, setDate] = useState<string>(new Date().toISOString().split("T")[0])
   const [value, setValue] = useState("")
   const [note, setNote] = useState("")
-  const [date, setDate] = useState<Date | null>(new Date())
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handles form submission
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!value || !date) return
-
-    onSubmit({
-      date: date.toISOString().split("T")[0],
-      value: parseFloat(value),
-      note: note.trim(),
-    })
-
+    const parsedValue = parseFloat(value)  // Convert input string to number
+    if (isNaN(parsedValue)) return         // Prevent submission if input is invalid
+    await onSubmit({ date, value: parsedValue, note })  // Submit the entry
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-xl shadow-sm bg-white">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Date input */}
       <div>
-        <Label className="mb-2">Value ({metric.unit})</Label>
+        <label className="block text-sm font-medium">Date</label>
         <Input
-          type="number"
-          step="any"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder={`Enter ${metric.name.toLowerCase()} value`}
-          required
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
         />
       </div>
 
+      {/* Value input with metric name and unit */}
       <div>
-        <Label className="mb-2">Date</Label>
-        <DatePicker value={date} onChange={setDate} />
+        <label className="block text-sm font-medium">
+          {metric.name} ({metric.unit})
+        </label>
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder={`Enter ${metric.name}`}
+        />
       </div>
 
+      {/* Optional note input */}
       <div>
-        <Label className="mb-2">Note (optional)</Label>
+        <label className="block text-sm font-medium">Note (optional)</label>
         <Textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Add any notes or observations"
         />
       </div>
 
-      <div className="flex justify-between">
-        <Button variant="outline" type="button" onClick={onCancel}>
+      {/* Cancel and Submit buttons */}
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit">Save Entry</Button>
+        <Button type="submit">
+          Save Entry
+        </Button>
       </div>
     </form>
   )
