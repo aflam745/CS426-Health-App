@@ -12,6 +12,12 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
 
   api:
     build:
@@ -23,16 +29,16 @@ services:
       - ./backend/.env
     depends_on:
       - db
+      - redis
 
   notifier:
     build:
-      context: ./backend
+      context: ./notifier
       dockerfile: Dockerfile
-    command: ["node", "dist/cron/emailReminderJob.js"]
     env_file:
-      - ./backend/.env
+      - ./notifier/.env
     depends_on:
-      - db
+      - redis
 
 volumes:
   db-data:
